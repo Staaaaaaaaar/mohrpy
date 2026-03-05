@@ -7,6 +7,48 @@ import numpy as np
 
 
 @dataclass(frozen=True)
+class PlaneNormal3D:
+    nx: float
+    ny: float
+    nz: float
+
+    def __post_init__(self):
+        mag = float(np.linalg.norm([self.nx, self.ny, self.nz]))
+        if mag == 0.0:
+            raise ValueError("3D normal direction cannot be zero.")
+        object.__setattr__(self, "nx", float(self.nx / mag))
+        object.__setattr__(self, "ny", float(self.ny / mag))
+        object.__setattr__(self, "nz", float(self.nz / mag))
+
+    @classmethod
+    def from_vector(cls, x: float, y: float, z: float) -> "PlaneNormal3D":
+        return cls(nx=x, ny=y, nz=z)
+
+    @classmethod
+    def from_angles_rad(cls, azimuth_rad: float, elevation_rad: float) -> "PlaneNormal3D":
+        """Create normal from azimuth/elevation angles.
+
+        azimuth: angle in x-y plane from +x.
+        elevation: angle from x-y plane toward +z.
+        """
+
+        ce = float(np.cos(elevation_rad))
+        return cls(
+            nx=ce * float(np.cos(azimuth_rad)),
+            ny=ce * float(np.sin(azimuth_rad)),
+            nz=float(np.sin(elevation_rad)),
+        )
+
+    @classmethod
+    def from_angles_deg(cls, azimuth_deg: float, elevation_deg: float) -> "PlaneNormal3D":
+        return cls.from_angles_rad(np.radians(azimuth_deg), np.radians(elevation_deg))
+
+    @property
+    def vector(self) -> np.ndarray:
+        return np.array([self.nx, self.ny, self.nz], dtype=float)
+
+
+@dataclass(frozen=True)
 class StressState3D:
     sigma_x: float
     sigma_y: float
@@ -51,6 +93,16 @@ class StressState3D:
     def max_shear_stress(self) -> float:
         s1, _, s3 = self.principal_stresses
         return 0.5 * (s1 - s3)
+
+    def stress_on(self, normal: PlaneNormal3D) -> Tuple[float, float]:
+        """Return (normal_stress, shear_stress_magnitude) on the plane with the given unit normal."""
+
+        n = normal.vector
+        t = self.tensor @ n
+        sigma_n = float(n @ t)
+        shear_vec = t - sigma_n * n
+        tau = float(np.linalg.norm(shear_vec))
+        return sigma_n, tau
 
 
 @dataclass(frozen=True)

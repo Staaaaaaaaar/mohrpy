@@ -1,7 +1,7 @@
 import math
 import numpy as np
 
-from mohrpy import MohrCircle3D, StressState3D
+from mohrpy import MohrCircle3D, PlaneNormal3D, StressState3D
 
 
 def test_stress_state_3d_principal_stresses_and_tensor():
@@ -54,3 +54,26 @@ def test_mohr3d_circles_from_state_principals():
     c12, c23, c13 = circle.circles
     assert c13[1] >= c12[1] >= 0.0
     assert c13[1] >= c23[1] >= 0.0
+
+
+def test_plane_normal_3d_builders_and_stress_projection():
+    n1 = PlaneNormal3D.from_vector(2.0, 0.0, 0.0)
+    assert math.isclose(float(np.linalg.norm(n1.vector)), 1.0, rel_tol=1e-9)
+    assert math.isclose(n1.nx, 1.0, rel_tol=1e-9)
+
+    n2 = PlaneNormal3D.from_angles_deg(0.0, 0.0)
+    assert math.isclose(n2.nx, 1.0, rel_tol=1e-9)
+    assert math.isclose(n2.ny, 0.0, abs_tol=1e-12)
+    assert math.isclose(n2.nz, 0.0, abs_tol=1e-12)
+
+    state = StressState3D(
+        sigma_x=80.0,
+        sigma_y=50.0,
+        sigma_z=20.0,
+        tau_xy=10.0,
+        tau_yz=5.0,
+        tau_zx=0.0,
+    )
+    sigma_n, tau = state.stress_on(PlaneNormal3D.from_vector(1.0, 0.0, 0.0))
+    assert math.isclose(sigma_n, 80.0, rel_tol=1e-9)
+    assert math.isclose(tau, 10.0, rel_tol=1e-9)

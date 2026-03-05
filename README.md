@@ -16,8 +16,11 @@
 - 可视化绘图（二维直角坐标系）：
   - 横轴：正应力 `sigma`
   - 纵轴：剪应力 `tau`
-  - 2D：绘制单 Mohr 圆，并在标注主应力点
-  - 3D：绘制三个 Mohr 圆，并在标注主应力点
+  - 2D：绘制单 Mohr 圆，并标注主应力点
+  - 3D：绘制三个 Mohr 圆，并标注主应力点
+- 支持按法向方向计算斜截面应力：
+  - 2D 法向：支持向量、角度、弧度输入
+  - 3D 法向：支持向量、方位角/俯仰角（度或弧度）输入
 
 ## 安装
 
@@ -71,8 +74,13 @@ print("circles (c,r):", circle.circles)  # (12), (23), (13)
 - `StressState2D(sigma_x, sigma_y, tau_xy)`
   - `.tensor`
   - `.principal_stresses -> tuple[float, float]`
-  - `.principal_angle_rad / .principal_angle_deg`
   - `.max_shear_stress`
+  - `.stress_on(normal: PlaneNormal2D) -> (sigma_n, tau)`
+- `PlaneNormal2D(nx, ny)`
+  - `.from_vector(x, y)`
+  - `.from_angle_rad(angle_rad)`
+  - `.from_angle_deg(angle_deg)`
+  - `.vector / .angle_rad / .angle_deg`
 - `MohrCircle2D(state)`
   - `.circle -> (center, radius)`
   - `.plot(ax=None, show=True, annotate=True)`
@@ -82,9 +90,49 @@ print("circles (c,r):", circle.circles)  # (12), (23), (13)
   - `.invariants -> tuple[I1, I2, I3]`
   - `.principal_stresses -> (sigma_1, sigma_2, sigma_3)`
   - `.max_shear_stress`
+  - `.stress_on(normal: PlaneNormal3D) -> (sigma_n, tau)`
+- `PlaneNormal3D(nx, ny, nz)`
+  - `.from_vector(x, y, z)`
+  - `.from_angles_rad(azimuth_rad, elevation_rad)`
+  - `.from_angles_deg(azimuth_deg, elevation_deg)`
+  - `.vector`
 - `MohrCircle3D(state)`
   - `.circles -> ((c12, r12), (c23, r23), (c13, r13))`
   - `.plot(ax=None, show=True, annotate=True)`
+
+## 斜截面应力示例
+
+### 2D 法向输入（向量/角度）
+
+```python
+from mohrpy import PlaneNormal2D, StressState2D
+
+state = StressState2D(80, 20, 30)
+
+n_vec = PlaneNormal2D.from_vector(1, 1)
+sigma_n, tau = state.stress_on(n_vec)
+print("2D by vector:", sigma_n, tau)
+
+n_deg = PlaneNormal2D.from_angle_deg(30)
+sigma_n, tau = state.stress_on(n_deg)
+print("2D by degree:", sigma_n, tau)
+```
+
+### 3D 法向输入（向量/方位角+俯仰角）
+
+```python
+from mohrpy import PlaneNormal3D, StressState3D
+
+state = StressState3D(80, 50, 20, 10, 5, 0)
+
+n_vec = PlaneNormal3D.from_vector(1, 1, 1)
+sigma_n, tau = state.stress_on(n_vec)
+print("3D by vector:", sigma_n, tau)
+
+n_ang = PlaneNormal3D.from_angles_deg(45, 20)
+sigma_n, tau = state.stress_on(n_ang)
+print("3D by angles:", sigma_n, tau)
+```
 
 ## 可视化示例
 
@@ -130,7 +178,7 @@ pytest
 ## 后续可扩展方向
 
 - [x] 增加 Mohr Circle 2D / 3D 的可视化模块
-- [ ] 计算任意斜截面的正应力和剪应力
+- [x] 计算任意斜截面的正应力和剪应力
 - [ ] 计算 2D/3D 主应力方向
 - [ ] 增加 Tresca / von Mises 等效应力计算
 - [ ] 增加破坏准则（Mohr-Coulomb / Drucker-Prager）
