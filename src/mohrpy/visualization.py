@@ -4,8 +4,8 @@ from typing import Optional
 
 import numpy as np
 
-from .mohr2d import MohrCircle2D
-from .mohr3d import MohrCircle3D
+from .mohr2d import MohrCircle2D, PlaneNormal2D
+from .mohr3d import MohrCircle3D, PlaneNormal3D
 
 
 def _base_axes(ax):
@@ -31,6 +31,7 @@ def _corner_text(ax, text: str):
 
 def plot_mohr_circle_2d(
     circle: MohrCircle2D,
+    normal: Optional[PlaneNormal2D] = None,
     ax: Optional[object] = None,
     show: bool = True,
     annotate: bool = True,
@@ -48,13 +49,24 @@ def plot_mohr_circle_2d(
 
     ax.plot(x, y, color="tab:blue", linewidth=2.0, label="Mohr circle")
 
+    info_lines = []
+    
+    if normal is not None:
+        sigma_n, tau = circle.state.stress_on(normal)
+        ax.scatter([sigma_n], [tau], color="tab:purple", s=30, zorder=5, label="Selected plane")
+
     if annotate:
         s1, s2 = circle.state.principal_stresses
         # Principal stresses lie on the sigma-axis where tau = 0.
-        ax.scatter([s1, s2], [0.0, 0.0], color="tab:red", s=40, zorder=4, label="Principal stresses")
+        ax.scatter([s1, s2], [0.0, 0.0], color="tab:red", s=30, zorder=4, label="Principal stresses")
         ax.annotate("sigma1", (s1, 0.0), xytext=(6, 8), textcoords="offset points", fontsize=9)
         ax.annotate("sigma2", (s2, 0.0), xytext=(6, -12), textcoords="offset points", fontsize=9)
-        _corner_text(ax, f"sigma1 = {s1:.3f}\nsigma2 = {s2:.3f}")
+        info_lines.extend([f"sigma1 = {s1:.3f}", f"sigma2 = {s2:.3f}"])
+        if normal is not None:
+            info_lines.extend([f"sigma_n = {sigma_n:.3f}", f"tau_n = {tau:.3f}"])
+
+    if info_lines:
+        _corner_text(ax, "\n".join(info_lines))
 
     _base_axes(ax)
     ax.set_aspect("equal", adjustable="datalim")
@@ -68,6 +80,7 @@ def plot_mohr_circle_2d(
 
 def plot_mohr_circle_3d(
     circle: MohrCircle3D,
+    normal: Optional[PlaneNormal3D] = None,
     ax: Optional[object] = None,
     show: bool = True,
     annotate: bool = True,
@@ -90,14 +103,25 @@ def plot_mohr_circle_3d(
         y = radius * np.sin(theta)
         ax.plot(x, y, color=color, linewidth=2.0, label=label)
 
+    info_lines = []
+    
+    if normal is not None:
+        sigma_n, tau = circle.state.stress_on(normal)
+        ax.scatter([sigma_n], [tau], color="tab:purple", s=30, zorder=5, label="Selected plane")
+
     if annotate:
         s1, s2, s3 = circle.state.principal_stresses
         # Principal stresses are x-intercepts in Mohr space.
-        ax.scatter([s1, s2, s3], [0.0, 0.0, 0.0], color="tab:red", s=40, zorder=4, label="Principal stresses")
+        ax.scatter([s1, s2, s3], [0.0, 0.0, 0.0], color="tab:red", s=30, zorder=4, label="Principal stresses")
         ax.annotate("sigma1", (s1, 0.0), xytext=(6, 8), textcoords="offset points", fontsize=9)
         ax.annotate("sigma2", (s2, 0.0), xytext=(6, -12), textcoords="offset points", fontsize=9)
         ax.annotate("sigma3", (s3, 0.0), xytext=(6, 8), textcoords="offset points", fontsize=9)
-        _corner_text(ax, f"sigma1 = {s1:.3f}\nsigma2 = {s2:.3f}\nsigma3 = {s3:.3f}")
+        info_lines.extend([f"sigma1 = {s1:.3f}", f"sigma2 = {s2:.3f}", f"sigma3 = {s3:.3f}"])
+        if normal is not None:
+            info_lines.extend([f"sigma_n = {sigma_n:.3f}", f"tau_n = {tau:.3f}"])
+
+    if info_lines:
+        _corner_text(ax, "\n".join(info_lines))
     
     _base_axes(ax)
     ax.set_aspect("equal", adjustable="datalim")

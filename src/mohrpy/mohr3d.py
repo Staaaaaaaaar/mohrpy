@@ -120,7 +120,7 @@ class MohrCircle3D:
         r13 = 0.5 * (s1 - s3)
         return (float(c12), float(r12)), (float(c23), float(r23)), (float(c13), float(r13))
 
-    def plot(self, ax=None, show: bool = True, annotate: bool = True):
+    def plot(self, normal: PlaneNormal3D | None = None, ax=None, show: bool = True, annotate: bool = True):
         from .visualization import plot_mohr_circle_3d
 
-        return plot_mohr_circle_3d(self, ax=ax, show=show, annotate=annotate)
+        return plot_mohr_circle_3d(self, normal=normal, ax=ax, show=show, annotate=annotate)

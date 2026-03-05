@@ -91,7 +91,7 @@ class MohrCircle2D:
         radius = float(np.hypot(0.5 * (self.state.sigma_x - self.state.sigma_y), self.state.tau_xy))
         return float(center), radius
 
-    def plot(self, ax=None, show: bool = True, annotate: bool = True):
+    def plot(self, normal: PlaneNormal2D | None = None, ax=None, show: bool = True, annotate: bool = True):
         from .visualization import plot_mohr_circle_2d
 
-        return plot_mohr_circle_2d(self, ax=ax, show=show, annotate=annotate)
+        return plot_mohr_circle_2d(self, normal=normal, ax=ax, show=show, annotate=annotate)

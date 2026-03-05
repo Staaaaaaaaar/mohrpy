@@ -83,7 +83,7 @@ print("circles (c,r):", circle.circles)  # (12), (23), (13)
   - `.vector / .angle_rad / .angle_deg`
 - `MohrCircle2D(state)`
   - `.circle -> (center, radius)`
-  - `.plot(ax=None, show=True, annotate=True)`
+  - `.plot(normal=None, ax=None, show=True, annotate=True)`
 
 - `StressState3D(sigma_x, sigma_y, sigma_z, tau_xy, tau_yz, tau_zx)`
   - `.tensor`
@@ -98,7 +98,7 @@ print("circles (c,r):", circle.circles)  # (12), (23), (13)
   - `.vector`
 - `MohrCircle3D(state)`
   - `.circles -> ((c12, r12), (c23, r23), (c13, r13))`
-  - `.plot(ax=None, show=True, annotate=True)`
+  - `.plot(normal=None, ax=None, show=True, annotate=True)`
 
 ## 斜截面应力示例
 
@@ -144,6 +144,10 @@ from mohrpy import StressState2D, MohrCircle2D
 state = StressState2D(sigma_x=80, sigma_y=20, tau_xy=30)
 circle = MohrCircle2D(state)
 circle.plot()  # 显示 2D Mohr 圆与主应力点/数值标签
+
+from mohrpy import PlaneNormal2D
+normal = PlaneNormal2D.from_angle_deg(30)
+circle.plot(normal=normal)  # 额外显示该法向对应的应力点
 ```
 
 ### 3D 三圆
@@ -161,6 +165,10 @@ state = StressState3D(
 )
 circle = MohrCircle3D(state)
 circle.plot()  # 显示 3D Mohr 三圆与主应力点/数值标签
+
+from mohrpy import PlaneNormal3D
+normal = PlaneNormal3D.from_angles_deg(45, 20)
+circle.plot(normal=normal)  # 额外显示该法向对应的应力点
 ```
 
 ## 数学约定
