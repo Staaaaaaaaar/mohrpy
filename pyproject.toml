@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling>=1.25.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mohrpy"
+version = "0.1.0"
+description = "A lightweight Python toolkit for 2D/3D Mohr circle analysis"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+dependencies = [
+  "numpy>=1.23",
+]
+authors = [
+  { name = "Sam" }
+]
+keywords = ["mohr", "stress", "mechanics", "solid mechanics", "principal stress"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Topic :: Scientific/Engineering",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mohrpy"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-q"
+testpaths = ["tests"]
