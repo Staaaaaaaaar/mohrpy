@@ -130,6 +130,8 @@ pytest
 ## 后续可扩展方向
 
 - [x] 增加 Mohr Circle 2D / 3D 的可视化模块
+- [ ] 计算任意斜截面的正应力和剪应力
+- [ ] 计算 2D/3D 主应力方向
 - [ ] 增加 Tresca / von Mises 等效应力计算
 - [ ] 增加破坏准则（Mohr-Coulomb / Drucker-Prager）
 - [ ] 增加命令行接口（CLI）
