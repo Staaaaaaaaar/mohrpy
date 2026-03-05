@@ -42,7 +42,6 @@ circle = MohrCircle2D(state)
 
 print("tensor:\n", state.tensor)
 print("principal stresses:", state.principal_stresses)
-print("principal angle (deg):", state.principal_angle_deg)
 print("max shear:", state.max_shear_stress)
 print("circle (center, radius):", circle.circle)
 ```
@@ -179,7 +178,6 @@ circle.plot(normal=normal)  # 额外显示该法向对应的应力点
 
 - 应力正号采用拉应力为正。
 - 3D 主应力按降序返回：$\sigma_1 \ge \sigma_2 \ge \sigma_3$。
-- 2D 主方向角采用物理平面角（非 Mohr 圆双角）。
 
 ## 测试
 
