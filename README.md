@@ -78,9 +78,8 @@ print("circles (c,r):", circle.circles)  # (12), (23), (13)
   - `.stress_on(normal: PlaneNormal2D) -> (sigma_n, tau)`
 - `PlaneNormal2D(nx, ny)`
   - `.from_vector(x, y)`
-  - `.from_angle_rad(angle_rad)`
-  - `.from_angle_deg(angle_deg)`
-  - `.vector / .angle_rad / .angle_deg`
+  - `.from_angle(angle_rad)`
+  - `.vector / .angle`
 - `MohrCircle2D(state)`
   - `.circle -> (center, radius)`
   - `.plot(normal=None, ax=None, show=True, annotate=True)`
@@ -93,9 +92,8 @@ print("circles (c,r):", circle.circles)  # (12), (23), (13)
   - `.stress_on(normal: PlaneNormal3D) -> (sigma_n, tau)`
 - `PlaneNormal3D(nx, ny, nz)`
   - `.from_vector(x, y, z)`
-  - `.from_angles_rad(azimuth_rad, elevation_rad)`
-  - `.from_angles_deg(azimuth_deg, elevation_deg)`
-  - `.vector`
+  - `.from_angles(azimuth_rad, elevation_rad)`
+  - `.vector / .azimuth / .elevation`
 - `MohrCircle3D(state)`
   - `.circles -> ((c12, r12), (c23, r23), (c13, r13))`
   - `.plot(normal=None, ax=None, show=True, annotate=True)`
@@ -105,6 +103,8 @@ print("circles (c,r):", circle.circles)  # (12), (23), (13)
 ### 2D 法向输入（向量/角度）
 
 ```python
+import numpy as np
+
 from mohrpy import PlaneNormal2D, StressState2D
 
 state = StressState2D(80, 20, 30)
@@ -113,14 +113,16 @@ n_vec = PlaneNormal2D.from_vector(1, 1)
 sigma_n, tau = state.stress_on(n_vec)
 print("2D by vector:", sigma_n, tau)
 
-n_deg = PlaneNormal2D.from_angle_deg(30)
-sigma_n, tau = state.stress_on(n_deg)
-print("2D by degree:", sigma_n, tau)
+n_ang = PlaneNormal2D.from_angle(np.deg2rad(30))
+sigma_n, tau = state.stress_on(n_ang)
+print("2D by angle:", sigma_n, tau)
 ```
 
 ### 3D 法向输入（向量/方位角+俯仰角）
 
 ```python
+import numpy as np
+
 from mohrpy import PlaneNormal3D, StressState3D
 
 state = StressState3D(80, 50, 20, 10, 5, 0)
@@ -129,7 +131,7 @@ n_vec = PlaneNormal3D.from_vector(1, 1, 1)
 sigma_n, tau = state.stress_on(n_vec)
 print("3D by vector:", sigma_n, tau)
 
-n_ang = PlaneNormal3D.from_angles_deg(45, 20)
+n_ang = PlaneNormal3D.from_angles(np.deg2rad(45), np.deg2rad(20))
 sigma_n, tau = state.stress_on(n_ang)
 print("3D by angles:", sigma_n, tau)
 ```
@@ -145,8 +147,9 @@ state = StressState2D(sigma_x=80, sigma_y=20, tau_xy=30)
 circle = MohrCircle2D(state)
 circle.plot()  # 显示 2D Mohr 圆与主应力点/数值标签
 
+import numpy as np
 from mohrpy import PlaneNormal2D
-normal = PlaneNormal2D.from_angle_deg(30)
+normal = PlaneNormal2D.from_angle(np.deg2rad(30))
 circle.plot(normal=normal)  # 额外显示该法向对应的应力点
 ```
 
@@ -166,8 +169,9 @@ state = StressState3D(
 circle = MohrCircle3D(state)
 circle.plot()  # 显示 3D Mohr 三圆与主应力点/数值标签
 
+import numpy as np
 from mohrpy import PlaneNormal3D
-normal = PlaneNormal3D.from_angles_deg(45, 20)
+normal = PlaneNormal3D.from_angles(np.deg2rad(45), np.deg2rad(20))
 circle.plot(normal=normal)  # 额外显示该法向对应的应力点
 ```
 

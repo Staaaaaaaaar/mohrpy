@@ -24,24 +24,16 @@ class PlaneNormal2D:
         return cls(nx=x, ny=y)
 
     @classmethod
-    def from_angle_rad(cls, angle_rad: float) -> "PlaneNormal2D":
+    def from_angle(cls, angle_rad: float) -> "PlaneNormal2D":
         return cls(nx=math.cos(angle_rad), ny=math.sin(angle_rad))
-
-    @classmethod
-    def from_angle_deg(cls, angle_deg: float) -> "PlaneNormal2D":
-        return cls.from_angle_rad(math.radians(angle_deg))
 
     @property
     def vector(self) -> np.ndarray:
         return np.array([self.nx, self.ny], dtype=float)
 
     @property
-    def angle_rad(self) -> float:
+    def angle(self) -> float:
         return float(math.atan2(self.ny, self.nx))
-
-    @property
-    def angle_deg(self) -> float:
-        return float(math.degrees(self.angle_rad))
 
 
 @dataclass(frozen=True)

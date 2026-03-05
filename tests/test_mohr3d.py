@@ -61,10 +61,12 @@ def test_plane_normal_3d_builders_and_stress_projection():
     assert math.isclose(float(np.linalg.norm(n1.vector)), 1.0, rel_tol=1e-9)
     assert math.isclose(n1.nx, 1.0, rel_tol=1e-9)
 
-    n2 = PlaneNormal3D.from_angles_deg(0.0, 0.0)
+    n2 = PlaneNormal3D.from_angles(0.0, 0.0)
     assert math.isclose(n2.nx, 1.0, rel_tol=1e-9)
     assert math.isclose(n2.ny, 0.0, abs_tol=1e-12)
     assert math.isclose(n2.nz, 0.0, abs_tol=1e-12)
+    assert math.isclose(n2.azimuth, 0.0, abs_tol=1e-12)
+    assert math.isclose(n2.elevation, 0.0, abs_tol=1e-12)
 
     state = StressState3D(
         sigma_x=80.0,

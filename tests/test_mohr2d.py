@@ -29,15 +29,16 @@ def test_plane_normal_2d_builders_and_stress_projection():
     n1 = PlaneNormal2D.from_vector(3.0, 4.0)
     assert math.isclose(float(np.linalg.norm(n1.vector)), 1.0, rel_tol=1e-9)
 
-    n2 = PlaneNormal2D.from_angle_deg(90.0)
+    n2 = PlaneNormal2D.from_angle(math.pi / 2.0)
     assert math.isclose(n2.nx, 0.0, abs_tol=1e-12)
     assert math.isclose(n2.ny, 1.0, rel_tol=1e-9)
+    assert math.isclose(n2.angle, math.pi / 2.0, rel_tol=1e-9)
 
     state = StressState2D(sigma_x=80.0, sigma_y=20.0, tau_xy=30.0)
-    sigma_n_x, tau_x = state.stress_on(PlaneNormal2D.from_angle_rad(0.0))
+    sigma_n_x, tau_x = state.stress_on(PlaneNormal2D.from_angle(0.0))
     assert math.isclose(sigma_n_x, 80.0, rel_tol=1e-9)
     assert math.isclose(tau_x, 30.0, rel_tol=1e-9)
 
-    sigma_n_y, tau_y = state.stress_on(PlaneNormal2D.from_angle_deg(90.0))
+    sigma_n_y, tau_y = state.stress_on(PlaneNormal2D.from_angle(math.pi / 2.0))
     assert math.isclose(sigma_n_y, 20.0, rel_tol=1e-9)
     assert math.isclose(tau_y, -30.0, rel_tol=1e-9)

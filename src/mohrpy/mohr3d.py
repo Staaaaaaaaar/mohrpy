@@ -25,11 +25,11 @@ class PlaneNormal3D:
         return cls(nx=x, ny=y, nz=z)
 
     @classmethod
-    def from_angles_rad(cls, azimuth_rad: float, elevation_rad: float) -> "PlaneNormal3D":
+    def from_angles(cls, azimuth_rad: float, elevation_rad: float) -> "PlaneNormal3D":
         """Create normal from azimuth/elevation angles.
 
         azimuth: angle in x-y plane from +x.
-        elevation: angle from x-y plane toward +z.
+        elevation: angle toward +z.
         """
 
         ce = float(np.cos(elevation_rad))
@@ -39,13 +39,17 @@ class PlaneNormal3D:
             nz=float(np.sin(elevation_rad)),
         )
 
-    @classmethod
-    def from_angles_deg(cls, azimuth_deg: float, elevation_deg: float) -> "PlaneNormal3D":
-        return cls.from_angles_rad(np.radians(azimuth_deg), np.radians(elevation_deg))
-
     @property
     def vector(self) -> np.ndarray:
         return np.array([self.nx, self.ny, self.nz], dtype=float)
+    
+    @property
+    def azimuth(self) -> float:
+        return float(np.arctan2(self.ny, self.nx))
+    
+    @property
+    def elevation(self) -> float:
+        return float(np.arctan2(self.nz, np.hypot(self.nx, self.ny)))
 
 
 @dataclass(frozen=True)

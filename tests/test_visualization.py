@@ -1,4 +1,5 @@
 import pytest
+import numpy as np
 
 matplotlib = pytest.importorskip("matplotlib")
 matplotlib.use("Agg")
@@ -20,7 +21,7 @@ def test_plot_2d_smoke():
 def test_plot_2d_with_normal_smoke():
     state = StressState2D(sigma_x=80.0, sigma_y=20.0, tau_xy=30.0)
     circle = MohrCircle2D(state)
-    normal = PlaneNormal2D.from_angle_deg(30.0)
+    normal = PlaneNormal2D.from_angle(np.deg2rad(30.0))
     ax = circle.plot(normal=normal, show=False, annotate=True)
 
     assert ax.get_xlabel() == "Normal stress (sigma)"
@@ -55,7 +56,7 @@ def test_plot_3d_with_normal_smoke():
         tau_zx=0.0,
     )
     circle = MohrCircle3D(state)
-    normal = PlaneNormal3D.from_angles_deg(45.0, 20.0)
+    normal = PlaneNormal3D.from_angles(np.deg2rad(45.0), np.deg2rad(20.0))
     ax = circle.plot(normal=normal, show=False, annotate=True)
 
     assert ax.get_xlabel() == "Normal stress (sigma)"
