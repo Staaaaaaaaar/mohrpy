@@ -16,8 +16,8 @@
 - 可视化绘图（二维直角坐标系）：
   - 横轴：正应力 `sigma`
   - 纵轴：剪应力 `tau`
-  - 2D：绘制单 Mohr 圆并标注状态点
-  - 3D：绘制三个 Mohr 圆并标注状态点
+  - 2D：绘制单 Mohr 圆，并在标注主应力点
+  - 3D：绘制三个 Mohr 圆，并在标注主应力点
 
 ## 安装
 
@@ -95,7 +95,7 @@ from mohrpy import StressState2D, MohrCircle2D
 
 state = StressState2D(sigma_x=80, sigma_y=20, tau_xy=30)
 circle = MohrCircle2D(state)
-circle.plot()  # 显示 2D Mohr 圆与状态点
+circle.plot()  # 显示 2D Mohr 圆与主应力点/数值标签
 ```
 
 ### 3D 三圆
@@ -112,7 +112,7 @@ state = StressState3D(
     tau_zx=0,
 )
 circle = MohrCircle3D(state)
-circle.plot()  # 显示 3D Mohr 三圆与状态点
+circle.plot()  # 显示 3D Mohr 三圆与主应力点/数值标签
 ```
 
 ## 数学约定
@@ -129,6 +129,7 @@ pytest
 
 ## 后续可扩展方向
 
+- [x] 增加 Mohr Circle 2D / 3D 的可视化模块
 - [ ] 增加 Tresca / von Mises 等效应力计算
 - [ ] 增加破坏准则（Mohr-Coulomb / Drucker-Prager）
 - [ ] 增加命令行接口（CLI）
