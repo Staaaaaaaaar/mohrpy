@@ -13,6 +13,11 @@
   - 2D 单圆 `(center, radius)`
   - 3D 三圆 `((c12,r12), (c23,r23), (c13,r13))`
   - 3D 应力不变量 $I_1, I_2, I_3$
+- 可视化绘图（二维直角坐标系）：
+  - 横轴：正应力 `sigma`
+  - 纵轴：剪应力 `tau`
+  - 2D：绘制单 Mohr 圆并标注状态点
+  - 3D：绘制三个 Mohr 圆并标注状态点
 
 ## 安装
 
@@ -70,6 +75,7 @@ print("circles (c,r):", circle.circles)  # (12), (23), (13)
   - `.max_shear_stress`
 - `MohrCircle2D(state)`
   - `.circle -> (center, radius)`
+  - `.plot(ax=None, show=True, annotate=True)`
 
 - `StressState3D(sigma_x, sigma_y, sigma_z, tau_xy, tau_yz, tau_zx)`
   - `.tensor`
@@ -78,6 +84,36 @@ print("circles (c,r):", circle.circles)  # (12), (23), (13)
   - `.max_shear_stress`
 - `MohrCircle3D(state)`
   - `.circles -> ((c12, r12), (c23, r23), (c13, r13))`
+  - `.plot(ax=None, show=True, annotate=True)`
+
+## 可视化示例
+
+### 2D 单圆
+
+```python
+from mohrpy import StressState2D, MohrCircle2D
+
+state = StressState2D(sigma_x=80, sigma_y=20, tau_xy=30)
+circle = MohrCircle2D(state)
+circle.plot()  # 显示 2D Mohr 圆与状态点
+```
+
+### 3D 三圆
+
+```python
+from mohrpy import StressState3D, MohrCircle3D
+
+state = StressState3D(
+    sigma_x=80,
+    sigma_y=50,
+    sigma_z=20,
+    tau_xy=10,
+    tau_yz=5,
+    tau_zx=0,
+)
+circle = MohrCircle3D(state)
+circle.plot()  # 显示 3D Mohr 三圆与状态点
+```
 
 ## 数学约定
 
@@ -93,10 +129,9 @@ pytest
 
 ## 后续可扩展方向
 
-- 增加 Tresca / von Mises 等效应力计算
-- 增加破坏准则（Mohr-Coulomb / Drucker-Prager）
-- 增加可视化绘图（Matplotlib）
-- 增加命令行接口（CLI）
+- [ ] 增加 Tresca / von Mises 等效应力计算
+- [ ] 增加破坏准则（Mohr-Coulomb / Drucker-Prager）
+- [ ] 增加命令行接口（CLI）
 
 ## 许可证
 

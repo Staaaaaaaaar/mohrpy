@@ -49,3 +49,8 @@ class MohrCircle2D:
         center = 0.5 * (self.state.sigma_x + self.state.sigma_y)
         radius = float(np.hypot(0.5 * (self.state.sigma_x - self.state.sigma_y), self.state.tau_xy))
         return float(center), radius
+
+    def plot(self, ax=None, show: bool = True, annotate: bool = True):
+        from .visualization import plot_mohr_circle_2d
+
+        return plot_mohr_circle_2d(self, ax=ax, show=show, annotate=annotate)
