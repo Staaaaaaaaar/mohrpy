@@ -3,6 +3,10 @@
 `mohrpy` 是一个轻量级 Python 工具包，用于 2D / 3D Mohr 圆分析与应力参数处理。
 当前版本使用 `numpy` 进行张量表示与主应力特征值求解。
 
+**在线交互演示：<https://staaaaaaaaar.github.io/mohrpy/>**
+
+网页支持实时输入应力分量、调整 2D 法向角或 3D 方位角/俯仰角、查看斜截面应力，并将图形导出为 SVG 或 PNG。浏览器版本位于 [`web/`](web/)，其公式和符号约定与 Python 包保持一致。
+
 ## 功能概览
 
 - 封装 2D 平面应力状态 `StressState2D` 与 `MohrCircle2D`
@@ -19,16 +23,34 @@
   - 2D：绘制单 Mohr 圆，并标注主应力点
   - 3D：绘制三个 Mohr 圆，并标注主应力点
 - 支持按法向方向计算斜截面应力：
-  - 2D 法向：支持向量、角度、弧度输入
-  - 3D 法向：支持向量、方位角/俯仰角（度或弧度）输入
+  - Python API：支持向量或弧度角输入
+  - Web 界面：角度控件使用度数输入
 
 ## 安装
 
-在项目根目录执行：
+从 PyPI 安装：
+
+```bash
+pip install mohrpy
+```
+
+开发模式下在项目根目录执行：
 
 ```bash
 pip install -e .
 ```
+
+### Web 界面本地开发
+
+需要 Node.js 22 或更高版本：
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+生产构建使用 `npm run build`，输出位于 `web/dist/`。合并到 `main` 后，[GitHub Pages workflow](.github/workflows/pages.yml) 会自动运行前端测试、构建并部署网站。
 
 ## 快速开始
 
@@ -177,18 +199,34 @@ circle.plot(normal=normal)  # 额外显示该法向对应的应力点
 ## 数学约定
 
 - 应力正号采用拉应力为正。
+- 所有应力分量必须使用相同单位；库和网页均不执行单位换算。
+- 2D `PlaneNormal2D.from_angle()` 与 3D `PlaneNormal3D.from_angles()` 接收弧度；网页滑块使用度数并在内部换算。
+- 2D `stress_on()` 返回相对法向逆时针切向的有符号剪应力；2D `.max_shear_stress` 是面内最大剪应力。
+- 3D `stress_on()` 的第二个返回值是剪应力向量的模长，因此始终大于或等于零。一般截面点位于 $\sigma_1$–$\sigma_3$ 外圆内部，不一定落在某个圆周上。
 - 3D 主应力按降序返回：$\sigma_1 \ge \sigma_2 \ge \sigma_3$。
 
 ## 测试
 
+Python：
+
 ```bash
 pytest
+```
+
+Web：
+
+```bash
+cd web
+npm test
+npm run lint
+npm run build
 ```
 
 ## 后续可扩展方向
 
 - [x] 增加 Mohr Circle 2D / 3D 的可视化模块
 - [x] 计算任意斜截面的正应力和剪应力
+- [x] 增加 GitHub Pages 交互式 2D / 3D Mohr 圆
 - [ ] 计算 2D/3D 主应力方向
 - [ ] 增加 Tresca / von Mises 等效应力计算
 - [ ] 增加破坏准则（Mohr-Coulomb / Drucker-Prager）

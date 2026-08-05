@@ -10,3 +10,7 @@ dist/
 .venv/
 venv/
 .vscode/
+node_modules/
+web/dist/
+web/coverage/
+*.tsbuildinfo
