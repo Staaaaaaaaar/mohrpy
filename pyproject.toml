@@ -14,7 +14,7 @@ dependencies = [
   "numpy>=1.23",
 ]
 authors = [
-  { name = "Sam" }
+  { name = "Xinghao Zheng" }
 ]
 keywords = ["mohr", "stress", "mechanics", "solid mechanics", "principal stress"]
 classifiers = [
