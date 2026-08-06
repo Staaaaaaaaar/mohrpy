@@ -56,7 +56,7 @@ export function boundsForAnalysis(result: AnalysisResult): MathBounds {
     tauMin: tauMin - padding,
     tauMax: tauMax + padding,
   }
-  assertFiniteResult(Object.values(bounds), '绘图范围')
+  assertFiniteResult(Object.values(bounds), 'Plot bounds')
   return bounds
 }
 
@@ -69,7 +69,7 @@ export function createPlotTransform(
   const innerWidth = width - margins.left - margins.right
   const innerHeight = height - margins.top - margins.bottom
   if (innerWidth <= 0 || innerHeight <= 0) {
-    throw new RangeError('绘图区域尺寸必须为正数。')
+    throw new RangeError('Plot dimensions must be positive.')
   }
 
   const sigmaCenter = (sourceBounds.sigmaMin + sourceBounds.sigmaMax) / 2
@@ -95,6 +95,8 @@ export function createPlotTransform(
     scale,
     mapX: (sigma) => margins.left + (sigma - bounds.sigmaMin) * scale,
     mapY: (tau) => margins.top + (bounds.tauMax - tau) * scale,
+    unmapX: (x) => bounds.sigmaMin + (x - margins.left) / scale,
+    unmapY: (y) => bounds.tauMax - (y - margins.top) / scale,
   }
 }
 

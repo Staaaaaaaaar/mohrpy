@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { analyze2D } from './mohr2d'
+import { analyze2D, angleDegreesFromMohrPoint } from './mohr2d'
 import { analyze3D } from './mohr3d'
 import { boundsForAnalysis, createPlotTransform } from './plot'
 
@@ -41,7 +41,30 @@ describe('2D Mohr analysis', () => {
   it('rejects non-finite inputs', () => {
     expect(() =>
       analyze2D({ sigmaX: Number.NaN, sigmaY: 20, tauXY: 30 }, 0),
-    ).toThrow(/有限数值/)
+    ).toThrow(/finite number/)
+  })
+
+  it('recovers the plane angle from a point on the circle', () => {
+    const state = { sigmaX: 80, sigmaY: 20, tauXY: 30 }
+    for (const angle of [0, 17, 45, 90, 137, 179]) {
+      const result = analyze2D(state, angle)
+      const recovered = angleDegreesFromMohrPoint(
+        state,
+        result.traction.sigmaN,
+        result.traction.tau,
+      )
+      expect(recovered).toBeCloseTo(angle, 10)
+    }
+  })
+
+  it('does not invent an angle for a hydrostatic circle', () => {
+    expect(
+      angleDegreesFromMohrPoint(
+        { sigmaX: 42, sigmaY: 42, tauXY: 0 },
+        42,
+        0,
+      ),
+    ).toBeNull()
   })
 })
 
@@ -165,5 +188,7 @@ describe('plot mapping', () => {
       transform.mapY(0) - transform.mapY(1),
       12,
     )
+    expect(transform.unmapX(transform.mapX(123.4))).toBeCloseTo(123.4, 12)
+    expect(transform.unmapY(transform.mapY(-2.5))).toBeCloseTo(-2.5, 12)
   })
 })

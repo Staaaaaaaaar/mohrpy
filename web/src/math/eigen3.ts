@@ -21,7 +21,7 @@ export function eigenvaluesSymmetric3(
   matrix: SymmetricMatrix3,
 ): readonly [number, number, number] {
   const flat = matrix.flat()
-  assertFiniteResult(flat, '三维应力张量')
+  assertFiniteResult(flat, '3D stress tensor')
 
   const scale = Math.max(...flat.map((value) => Math.abs(value)))
   if (scale === 0) {
@@ -84,6 +84,6 @@ export function eigenvaluesSymmetric3(
   const eigenvalues = [a[0][0] * scale, a[1][1] * scale, a[2][2] * scale]
     .sort((left, right) => right - left)
 
-  assertFiniteResult(eigenvalues, '三维主应力')
+  assertFiniteResult(eigenvalues, '3D principal stresses')
   return [eigenvalues[0], eigenvalues[1], eigenvalues[2]]
 }

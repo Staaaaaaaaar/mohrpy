@@ -96,4 +96,6 @@ export type PlotTransform = {
   scale: number
   mapX: (sigma: number) => number
   mapY: (tau: number) => number
+  unmapX: (x: number) => number
+  unmapY: (y: number) => number
 }

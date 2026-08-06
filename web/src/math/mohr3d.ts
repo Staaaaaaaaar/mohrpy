@@ -65,7 +65,7 @@ export function invariants3D(state: StressState3D): StressInvariants3D {
     sigmaY * tauZX * tauZX -
     sigmaZ * tauXY * tauXY
 
-  assertFiniteResult([i1, i2, i3], '三维应力不变量')
+  assertFiniteResult([i1, i2, i3], '3D stress invariants')
   return { i1, i2, i3 }
 }
 
@@ -96,7 +96,7 @@ export function stressOnPlane3D(
   const tau = Math.hypot(shearX, shearY, shearZ)
   assertFiniteResult(
     [sigmaN, shearX, shearY, shearZ, tau],
-    '三维斜截面应力',
+    '3D plane traction',
   )
 
   const scale = Math.max(...Object.values(state).map((value) => Math.abs(value)))
@@ -142,7 +142,7 @@ export function analyze3D(
       circle13.center,
       circle13.radius,
     ],
-    '三维 Mohr 圆计算结果',
+    '3D Mohr circle result',
   )
 
   const normal = normal3DFromAnglesDegrees(

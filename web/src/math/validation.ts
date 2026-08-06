@@ -2,11 +2,11 @@ const ZERO_TOLERANCE = 1e-12
 
 export function assertFiniteRecord<T extends object>(
   values: T,
-  context = '应力分量',
+  context = 'Stress component',
 ): void {
   for (const [name, value] of Object.entries(values)) {
     if (typeof value !== 'number' || !Number.isFinite(value)) {
-      throw new RangeError(`${context} ${name} 必须是有限数值。`)
+      throw new RangeError(`${context} ${name} must be a finite number.`)
     }
   }
 }
@@ -16,13 +16,13 @@ export function assertFiniteResult(
   context: string,
 ): void {
   if (values.some((value) => !Number.isFinite(value))) {
-    throw new RangeError(`${context} 超出浏览器可计算的数值范围。`)
+    throw new RangeError(`${context} exceeds the browser's numeric range.`)
   }
 }
 
 export function degreesToRadians(degrees: number): number {
   if (!Number.isFinite(degrees)) {
-    throw new RangeError('角度必须是有限数值。')
+    throw new RangeError('Angle must be a finite number.')
   }
   return (degrees * Math.PI) / 180
 }

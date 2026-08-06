@@ -37,7 +37,7 @@ export function stressOnPlane2D(
   const tangentX = -normal.ny
   const tangentY = normal.nx
   const tau = tangentX * tractionX + tangentY * tractionY
-  assertFiniteResult([sigmaN, tau], '二维斜截面应力')
+  assertFiniteResult([sigmaN, tau], '2D plane traction')
 
   const scale = Math.max(
     Math.abs(state.sigmaX),
@@ -48,6 +48,27 @@ export function stressOnPlane2D(
     sigmaN: cleanZero(sigmaN, scale),
     tau: cleanZero(tau, scale),
   }
+}
+
+export function angleDegreesFromMohrPoint(
+  state: StressState2D,
+  sigmaN: number,
+  tau: number,
+): number | null {
+  assertFiniteRecord(state)
+  assertFiniteResult([sigmaN, tau], '2D Mohr circle interaction point')
+
+  const center = state.sigmaX / 2 + state.sigmaY / 2
+  const halfDifference = state.sigmaX / 2 - state.sigmaY / 2
+  const radius = Math.hypot(halfDifference, state.tauXY)
+  if (radius === 0) {
+    return null
+  }
+
+  const referenceAngle = Math.atan2(state.tauXY, halfDifference)
+  const pointAngle = Math.atan2(tau, sigmaN - center)
+  const rawDegrees = ((referenceAngle - pointAngle) * 90) / Math.PI
+  return ((rawDegrees % 180) + 180) % 180
 }
 
 export function analyze2D(
@@ -63,7 +84,7 @@ export function analyze2D(
   const sigma2 = center - radius
   assertFiniteResult(
     [center, radius, sigma1, sigma2],
-    '二维 Mohr 圆计算结果',
+    '2D Mohr circle result',
   )
 
   const normal = normal2DFromAngleDegrees(normalAngleDegrees)
