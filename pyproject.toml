@@ -10,20 +10,43 @@ readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"
 dependencies = [
-  "matplotlib>=3.7",
   "numpy>=1.23",
 ]
 authors = [
-  { name = "Xinghao Zheng" }
+  { name = "Staaaaaaaaar" }
 ]
 keywords = ["mohr", "stress", "mechanics", "solid mechanics", "principal stress"]
 classifiers = [
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
   "Topic :: Scientific/Engineering",
 ]
+
+[project.optional-dependencies]
+plot = [
+  "matplotlib>=3.7",
+]
+dev = [
+  "build>=1.2",
+  "matplotlib>=3.7",
+  "pytest>=7",
+  "pytest-cov>=5",
+  "ruff>=0.12",
+  "twine>=5",
+]
+
+[project.urls]
+Homepage = "https://staaaaaaaaar.github.io/mohrpy/"
+Repository = "https://github.com/staaaaaaaaar/mohrpy"
+Issues = "https://github.com/staaaaaaaaar/mohrpy/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/mohrpy"]
@@ -32,3 +55,10 @@ packages = ["src/mohrpy"]
 minversion = "7.0"
 addopts = "-q"
 testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]

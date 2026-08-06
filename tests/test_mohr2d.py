@@ -1,5 +1,7 @@
 import math
+
 import numpy as np
+import pytest
 
 from mohrpy import MohrCircle2D, PlaneNormal2D, StressState2D
 
@@ -42,3 +44,47 @@ def test_plane_normal_2d_builders_and_stress_projection():
     sigma_n_y, tau_y = state.stress_on(PlaneNormal2D.from_angle(math.pi / 2.0))
     assert math.isclose(sigma_n_y, 20.0, rel_tol=1e-9)
     assert math.isclose(tau_y, -30.0, rel_tol=1e-9)
+
+
+@pytest.mark.parametrize("value", [math.nan, math.inf, -math.inf])
+def test_stress_state_2d_rejects_non_finite_values(value):
+    with pytest.raises(ValueError, match="finite"):
+        StressState2D(value, 20.0, 30.0)
+
+
+@pytest.mark.parametrize(
+    "components",
+    [(0.0, 0.0), (math.nan, 1.0)],
+)
+def test_plane_normal_2d_rejects_invalid_directions(components):
+    with pytest.raises(ValueError):
+        PlaneNormal2D.from_vector(*components)
+
+
+def test_plane_normal_2d_normalizes_large_values():
+    normal = PlaneNormal2D.from_vector(1e308, 1e308)
+    assert math.isclose(math.hypot(normal.nx, normal.ny), 1.0, rel_tol=1e-15)
+
+
+def test_plane_normal_2d_normalizes_subnormal_values():
+    normal = PlaneNormal2D.from_vector(5e-324, 5e-324)
+    assert math.isclose(math.hypot(normal.nx, normal.ny), 1.0, rel_tol=1e-15)
+
+
+def test_mohr2d_large_center_remains_finite():
+    state = StressState2D(1e308, 1e308, 0.0)
+    center, radius = MohrCircle2D(state).circle
+    assert center == 1e308
+    assert radius == 0.0
+    assert state.principal_stresses == (1e308, 1e308)
+
+
+def test_stress_projection_lies_on_2d_mohr_circle():
+    state = StressState2D(80.0, 20.0, 30.0)
+    center, radius = MohrCircle2D(state).circle
+
+    for angle in np.linspace(-math.pi, math.pi, 25):
+        sigma_n, tau = state.stress_on(PlaneNormal2D.from_angle(float(angle)))
+        assert math.isclose(math.hypot(sigma_n - center, tau), radius, rel_tol=1e-12)
+
+    assert state.max_shear_stress == state.max_in_plane_shear_stress

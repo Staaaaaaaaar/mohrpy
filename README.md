@@ -32,12 +32,16 @@
 
 ```bash
 pip install mohrpy
+# 如需 Matplotlib 绘图：
+pip install "mohrpy[plot]"
 ```
 
 开发模式下在项目根目录执行：
 
 ```bash
-pip install -e .
+conda create -n mohrpy-dev python=3.11 -y
+conda activate mohrpy-dev
+pip install -e ".[dev]"
 ```
 
 ### Web 界面本地开发
@@ -95,7 +99,7 @@ print("circles (c,r):", circle.circles)  # (12), (23), (13)
 - `StressState2D(sigma_x, sigma_y, tau_xy)`
   - `.tensor`
   - `.principal_stresses -> tuple[float, float]`
-  - `.max_shear_stress`
+  - `.max_in_plane_shear_stress`（`.max_shear_stress` 为兼容别名）
   - `.stress_on(normal: PlaneNormal2D) -> (sigma_n, tau)`
 - `PlaneNormal2D(nx, ny)`
   - `.from_vector(x, y)`
@@ -103,7 +107,7 @@ print("circles (c,r):", circle.circles)  # (12), (23), (13)
   - `.vector / .angle`
 - `MohrCircle2D(state)`
   - `.circle -> (center, radius)`
-  - `.plot(normal=None, ax=None, show=True, annotate=True)`
+  - `.plot(normal=None, ax=None, show=False, annotate=True)`
 
 - `StressState3D(sigma_x, sigma_y, sigma_z, tau_xy, tau_yz, tau_zx)`
   - `.tensor`
@@ -111,13 +115,14 @@ print("circles (c,r):", circle.circles)  # (12), (23), (13)
   - `.principal_stresses -> (sigma_1, sigma_2, sigma_3)`
   - `.max_shear_stress`
   - `.stress_on(normal: PlaneNormal3D) -> (sigma_n, tau)`
+  - `.traction_on(normal: PlaneNormal3D) -> (sigma_n, shear_vector)`
 - `PlaneNormal3D(nx, ny, nz)`
   - `.from_vector(x, y, z)`
   - `.from_angles(azimuth_rad, elevation_rad)`
   - `.vector / .azimuth / .elevation`
 - `MohrCircle3D(state)`
   - `.circles -> ((c12, r12), (c23, r23), (c13, r13))`
-  - `.plot(normal=None, ax=None, show=True, annotate=True)`
+  - `.plot(normal=None, ax=None, show=False, annotate=True)`
 
 ## 斜截面应力示例
 
@@ -166,12 +171,12 @@ from mohrpy import StressState2D, MohrCircle2D
 
 state = StressState2D(sigma_x=80, sigma_y=20, tau_xy=30)
 circle = MohrCircle2D(state)
-circle.plot()  # 显示 2D Mohr 圆与主应力点/数值标签
+circle.plot(show=True)  # 显示 2D Mohr 圆与主应力点/数值标签
 
 import numpy as np
 from mohrpy import PlaneNormal2D
 normal = PlaneNormal2D.from_angle(np.deg2rad(30))
-circle.plot(normal=normal)  # 额外显示该法向对应的应力点
+circle.plot(normal=normal, show=True)  # 额外显示该法向对应的应力点
 ```
 
 ### 3D 三圆
@@ -188,12 +193,12 @@ state = StressState3D(
     tau_zx=0,
 )
 circle = MohrCircle3D(state)
-circle.plot()  # 显示 3D Mohr 三圆与主应力点/数值标签
+circle.plot(show=True)  # 显示 3D Mohr 三圆与主应力点/数值标签
 
 import numpy as np
 from mohrpy import PlaneNormal3D
 normal = PlaneNormal3D.from_angles(np.deg2rad(45), np.deg2rad(20))
-circle.plot(normal=normal)  # 额外显示该法向对应的应力点
+circle.plot(normal=normal, show=True)  # 额外显示该法向对应的应力点
 ```
 
 ## 数学约定
@@ -210,8 +215,11 @@ circle.plot(normal=normal)  # 额外显示该法向对应的应力点
 Python：
 
 ```bash
-pytest
+conda run -n mohrpy-dev env -u PYTHONPATH pytest
+conda run -n mohrpy-dev ruff check .
 ```
+
+这里移除继承的 `PYTHONPATH`，避免系统级 Python/ROS 插件污染 Conda 测试环境。
 
 Web：
 

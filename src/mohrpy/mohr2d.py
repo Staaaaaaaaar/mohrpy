@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import math
-from typing import Tuple
+from dataclasses import dataclass
 
 import numpy as np
+
+from ._validation import finite_float, normalized_components
 
 
 @dataclass(frozen=True)
@@ -13,18 +14,21 @@ class PlaneNormal2D:
     ny: float
 
     def __post_init__(self):
-        mag = float(np.hypot(self.nx, self.ny))
-        if mag == 0.0:
-            raise ValueError("2D normal direction cannot be zero.")
-        object.__setattr__(self, "nx", float(self.nx / mag))
-        object.__setattr__(self, "ny", float(self.ny / mag))
+        nx, ny = normalized_components(
+            (self.nx, self.ny),
+            ("nx", "ny"),
+            "2D normal",
+        )
+        object.__setattr__(self, "nx", nx)
+        object.__setattr__(self, "ny", ny)
 
     @classmethod
-    def from_vector(cls, x: float, y: float) -> "PlaneNormal2D":
+    def from_vector(cls, x: float, y: float) -> PlaneNormal2D:
         return cls(nx=x, ny=y)
 
     @classmethod
-    def from_angle(cls, angle_rad: float) -> "PlaneNormal2D":
+    def from_angle(cls, angle_rad: float) -> PlaneNormal2D:
+        angle_rad = finite_float(angle_rad, "angle_rad")
         return cls(nx=math.cos(angle_rad), ny=math.sin(angle_rad))
 
     @property
@@ -42,6 +46,17 @@ class StressState2D:
     sigma_y: float
     tau_xy: float
 
+    def __post_init__(self):
+        for name in ("sigma_x", "sigma_y", "tau_xy"):
+            object.__setattr__(self, name, finite_float(getattr(self, name), name))
+
+    @property
+    def _circle_parameters(self) -> tuple[float, float]:
+        center = self.sigma_x / 2.0 + self.sigma_y / 2.0
+        half_difference = self.sigma_x / 2.0 - self.sigma_y / 2.0
+        radius = math.hypot(half_difference, self.tau_xy)
+        return center, radius
+
     @property
     def tensor(self) -> np.ndarray:
         return np.array(
@@ -50,17 +65,21 @@ class StressState2D:
         )
 
     @property
-    def principal_stresses(self) -> Tuple[float, float]:
-        eigvals = np.linalg.eigvalsh(self.tensor)
-        s1, s2 = eigvals[::-1]
-        return float(s1), float(s2)
+    def principal_stresses(self) -> tuple[float, float]:
+        center, radius = self._circle_parameters
+        return center + radius, center - radius
 
     @property
     def max_shear_stress(self) -> float:
-        s1, s2 = self.principal_stresses
-        return 0.5 * (s1 - s2)
+        """Return the maximum in-plane shear stress."""
 
-    def stress_on(self, normal: PlaneNormal2D) -> Tuple[float, float]:
+        return self.max_in_plane_shear_stress
+
+    @property
+    def max_in_plane_shear_stress(self) -> float:
+        return self._circle_parameters[1]
+
+    def stress_on(self, normal: PlaneNormal2D) -> tuple[float, float]:
         """Return (normal_stress, shear_stress) on the plane with the given unit normal."""
 
         n = normal.vector
@@ -78,12 +97,16 @@ class MohrCircle2D:
     state: StressState2D
 
     @property
-    def circle(self) -> Tuple[float, float]:
-        center = 0.5 * (self.state.sigma_x + self.state.sigma_y)
-        radius = float(np.hypot(0.5 * (self.state.sigma_x - self.state.sigma_y), self.state.tau_xy))
-        return float(center), radius
+    def circle(self) -> tuple[float, float]:
+        return self.state._circle_parameters
 
-    def plot(self, normal: PlaneNormal2D | None = None, ax=None, show: bool = True, annotate: bool = True):
+    def plot(
+        self,
+        normal: PlaneNormal2D | None = None,
+        ax=None,
+        show: bool = False,
+        annotate: bool = True,
+    ):
         from .visualization import plot_mohr_circle_2d
 
         return plot_mohr_circle_2d(self, normal=normal, ax=ax, show=show, annotate=annotate)
