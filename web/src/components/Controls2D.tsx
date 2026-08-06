@@ -21,28 +21,31 @@ export function Controls2D({
   return (
     <>
       <section className="control-section" aria-labelledby="stress-2d-heading">
-        <h2 className="control-heading" id="stress-2d-heading">
-          平面应力分量
-        </h2>
+        <header className="control-section-header">
+          <h2 className="control-heading" id="stress-2d-heading">
+            Plane stress
+          </h2>
+          <p>Components in the x–y coordinate system</p>
+        </header>
         <div className="input-grid">
           <NumberField
             id="sigma-x-2d"
             symbol={<>σ<sub>x</sub></>}
-            label="正应力"
+            label="Normal stress"
             value={state.sigmaX}
             onChange={(value) => update('sigmaX', value)}
           />
           <NumberField
             id="sigma-y-2d"
             symbol={<>σ<sub>y</sub></>}
-            label="正应力"
+            label="Normal stress"
             value={state.sigmaY}
             onChange={(value) => update('sigmaY', value)}
           />
           <NumberField
             id="tau-xy-2d"
             symbol={<>τ<sub>xy</sub></>}
-            label="剪应力"
+            label="Shear stress"
             value={state.tauXY}
             onChange={(value) => update('tauXY', value)}
           />
@@ -50,25 +53,32 @@ export function Controls2D({
       </section>
 
       <section className="control-section" aria-labelledby="normal-2d-heading">
-        <h2 className="control-heading" id="normal-2d-heading">
-          截面法向
-        </h2>
+        <header className="control-section-header">
+          <label
+            className="control-heading"
+            id="normal-2d-heading"
+            htmlFor="normal-angle-2d"
+          >
+            Plane normal
+          </label>
+          <p>Measured counterclockwise from +x</p>
+        </header>
         <div className="range-row">
           <input
             className="range-input"
+            id="normal-angle-2d"
             type="range"
             min="0"
             max="180"
             step="1"
             value={angle}
-            aria-label="二维截面法向角"
+            aria-label="2D plane normal angle"
             onChange={(event) => onAngleChange(event.currentTarget.valueAsNumber)}
           />
-          <output className="range-value">{angle.toFixed(0)}°</output>
+          <output className="range-value" htmlFor="normal-angle-2d">
+            {angle.toFixed(0)}°
+          </output>
         </div>
-        <p className="plot-subtitle">
-          法向从 +x 轴逆时针旋转；输入角度以度为单位。
-        </p>
       </section>
     </>
   )

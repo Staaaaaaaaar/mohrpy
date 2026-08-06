@@ -1,6 +1,7 @@
 # mohrpy interactive site
 
-React、TypeScript 与 Vite 实现的静态交互界面，部署地址为：
+Static React, TypeScript and Vite interface for interactive 2D and 3D Mohr
+circle analysis:
 
 <https://staaaaaaaaar.github.io/mohrpy/>
 
@@ -14,4 +15,6 @@ npm run lint
 npm run build
 ```
 
-Vite 的公共路径固定为 `/mohrpy/`，用于 GitHub Pages 项目站。前端数学实现位于 `src/math/`，应与仓库根目录的 Python 实现保持数值一致。
+The frontend calculation core lives in `src/math/` and must remain numerically
+consistent with the Python implementation. GitHub Pages supplies the production
+base path through `VITE_BASE_PATH`; local development defaults to `/`.

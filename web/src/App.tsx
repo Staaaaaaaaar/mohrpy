@@ -1,10 +1,9 @@
 import { useMemo, useRef, useState } from 'react'
 
-import { Controls2D } from './components/Controls2D'
-import { Controls3D } from './components/Controls3D'
+import { ControlPanel } from './components/ControlPanel'
+import { DataPanel } from './components/DataPanel'
 import { ExportButtons } from './components/ExportButtons'
 import { MohrPlot } from './components/MohrPlot'
-import { ResultsPanel } from './components/ResultsPanel'
 import { analyze2D, DEFAULT_STRESS_2D } from './math/mohr2d'
 import { analyze3D, DEFAULT_STRESS_3D } from './math/mohr3d'
 import type {
@@ -20,7 +19,7 @@ type AnalysisOutcome = {
 }
 
 function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : '计算失败，请检查输入。'
+  return error instanceof Error ? error.message : 'Analysis failed. Check the input values.'
 }
 
 function App() {
@@ -30,6 +29,7 @@ function App() {
   const [angle2D, setAngle2D] = useState(30)
   const [azimuth3D, setAzimuth3D] = useState(45)
   const [elevation3D, setElevation3D] = useState(20)
+  const [controlsOpen, setControlsOpen] = useState(false)
   const svgRef = useRef<SVGSVGElement>(null)
 
   const outcome = useMemo<AnalysisOutcome>(() => {
@@ -56,129 +56,130 @@ function App() {
   }
 
   return (
-    <main className="app-shell">
+    <div className="app-shell">
+      <a className="skip-link" href="#analysis-workspace">
+        Skip to analysis workspace
+      </a>
       <header className="site-header">
-        <a className="brand" href={import.meta.env.BASE_URL} aria-label="mohrpy 首页">
-          <span className="brand-mark" aria-hidden="true">M</span>
-          <span>mohrpy</span>
+        <a className="brand" href={import.meta.env.BASE_URL} aria-label="mohrpy home">
+          <b>mohrpy</b>
+          <small>Studio</small>
         </a>
         <a
           className="github-link"
           href="https://github.com/Staaaaaaaaar/mohrpy"
           target="_blank"
           rel="noreferrer"
+          aria-label="View mohrpy on GitHub"
         >
-          GitHub
+          <svg aria-hidden="true" viewBox="0 0 16 16">
+            <path
+              fill="currentColor"
+              d="M8 0C3.58 0 0 3.64 0 8.13c0 3.59 2.29 6.64 5.47 7.71.4.08.55-.18.55-.39 0-.19-.01-.83-.01-1.51-2.01.38-2.53-.5-2.69-.96-.09-.23-.48-.96-.82-1.15-.28-.15-.68-.53-.01-.54.63-.01 1.08.59 1.23.83.72 1.23 1.87.88 2.33.67.07-.53.28-.88.51-1.08-1.78-.21-3.64-.91-3.64-4.02 0-.89.31-1.62.82-2.19-.08-.21-.36-1.04.08-2.16 0 0 .67-.22 2.2.84A7.47 7.47 0 0 1 8 3.91c.68 0 1.36.09 2 .27 1.53-1.06 2.2-.84 2.2-.84.44 1.12.16 1.95.08 2.16.51.57.82 1.29.82 2.19 0 3.12-1.87 3.81-3.65 4.02.29.25.54.74.54 1.51 0 1.09-.01 1.96-.01 2.23 0 .21.15.47.55.39A8.13 8.13 0 0 0 16 8.13C16 3.64 12.42 0 8 0Z"
+            />
+          </svg>
         </a>
       </header>
 
-      <section className="hero-copy">
-        <p className="eyebrow">INTERACTIVE STRESS ANALYSIS</p>
-        <h1>交互式 Mohr 圆</h1>
-        <p>
-          实时探索二维与三维应力状态。输入分量、调整截面方向，并观察主应力与剪应力如何变化。
-        </p>
-      </section>
-
-      <section className="workspace" aria-label="Mohr 圆分析工作区">
-        <aside className="panel controls-panel">
-          <p className="section-kicker">Analysis controls</p>
-          <div className="mode-switcher" aria-label="分析维度">
-            <button
-              className="mode-button"
-              type="button"
-              aria-pressed={mode === '2d'}
-              onClick={() => setMode('2d')}
-            >
-              2D 单圆
-            </button>
-            <button
-              className="mode-button"
-              type="button"
-              aria-pressed={mode === '3d'}
-              onClick={() => setMode('3d')}
-            >
-              3D 三圆
-            </button>
+      <main>
+        <section className="instrument-heading">
+          <div>
+            <h1>Mohr circle explorer</h1>
           </div>
+          <p>
+            Adjust the stress tensor and plane orientation to inspect principal
+            stresses, plane traction and Mohr circle geometry in real time.
+          </p>
+        </section>
 
-          {mode === '2d' ? (
-            <Controls2D
-              state={state2D}
-              angle={angle2D}
-              onStateChange={setState2D}
-              onAngleChange={setAngle2D}
-            />
-          ) : (
-            <Controls3D
-              state={state3D}
-              azimuth={azimuth3D}
-              elevation={elevation3D}
-              normal={
-                outcome.result?.mode === '3d'
-                  ? outcome.result.normal
-                  : undefined
-              }
-              onStateChange={setState3D}
-              onAzimuthChange={setAzimuth3D}
-              onElevationChange={setElevation3D}
-            />
-          )}
+        <section
+          className="workspace"
+          id="analysis-workspace"
+          aria-label="Mohr circle analysis workspace"
+        >
+          <ControlPanel
+            mode={mode}
+            state2D={state2D}
+            state3D={state3D}
+            angle2D={angle2D}
+            azimuth3D={azimuth3D}
+            elevation3D={elevation3D}
+            normal={
+              outcome.result?.mode === '3d' ? outcome.result.normal : undefined
+            }
+            error={outcome.error}
+            open={controlsOpen}
+            onOpenChange={setControlsOpen}
+            onModeChange={setMode}
+            onState2DChange={setState2D}
+            onState3DChange={setState3D}
+            onAngle2DChange={setAngle2D}
+            onAzimuth3DChange={setAzimuth3D}
+            onElevation3DChange={setElevation3D}
+            onReset={resetCurrentMode}
+          />
 
-          <section className="control-section">
-            <button
-              className="button"
-              type="button"
-              onClick={resetCurrentMode}
-            >
-              恢复示例数据
-            </button>
-            <p className="plot-subtitle" style={{ marginTop: 10 }}>
-              所有应力分量必须使用相同单位。
-            </p>
+          <section className="plot-stage" aria-labelledby="plot-heading">
+            <div className="stage-meta">
+              <span>{mode === '2d' ? 'Plane stress / 2D' : 'Stress tensor / 3D'}</span>
+              <span className="drag-hint">
+                {mode === '2d' ? 'Drag the point to rotate the plane' : 'Move to inspect σ / τ'}
+              </span>
+            </div>
+            <header className="plot-heading">
+              <div className="plot-heading-copy">
+                <h2 id="plot-heading">
+                  {mode === '2d' ? '2D Mohr circle' : '3D Mohr circles'}
+                </h2>
+                <p>Normal stress σ on the horizontal axis; shear stress τ vertically.</p>
+              </div>
+              {outcome.result ? (
+                <ExportButtons svgRef={svgRef} mode={mode} />
+              ) : null}
+            </header>
+            <div className="plot-frame">
+              {outcome.result ? (
+                <MohrPlot
+                  ref={svgRef}
+                  result={outcome.result}
+                  onAngleChange={
+                    outcome.result.mode === '2d' ? setAngle2D : undefined
+                  }
+                />
+              ) : (
+                <div className="plot-empty">
+                  Enter finite values to restore the Mohr circle.
+                </div>
+              )}
+            </div>
+            <div className="stage-legend" aria-label="Plot legend">
+              {mode === '3d' ? (
+                <>
+                  <span><i className="legend-line circle-13" />Circle 1–3</span>
+                  <span><i className="legend-line circle-12" />Circle 1–2</span>
+                  <span><i className="legend-line circle-23" />Circle 2–3</span>
+                </>
+              ) : (
+                <span><i className="legend-line circle-2d" />Mohr circle</span>
+              )}
+              <span><i className="legend-point" />Selected plane</span>
+            </div>
           </section>
 
-          {outcome.error ? (
-            <p className="error-banner" role="alert">
-              {outcome.error}
-            </p>
-          ) : null}
-        </aside>
-
-        <section className="panel plot-panel">
-          <header className="plot-toolbar">
-            <div>
-              <h2 className="panel-heading">
-                {mode === '2d' ? '二维 Mohr 圆' : '三维 Mohr 三圆'}
-              </h2>
-              <p className="plot-subtitle">
-                横轴为正应力 σ，纵轴为剪应力 τ，拉应力取正。
-              </p>
-            </div>
+          <aside className="data-panel panel" aria-live="polite">
             {outcome.result ? (
-              <ExportButtons svgRef={svgRef} mode={mode} />
-            ) : null}
-          </header>
-
-          <div className="plot-frame">
-            {outcome.result ? (
-              <MohrPlot ref={svgRef} result={outcome.result} />
+              <DataPanel result={outcome.result} />
             ) : (
-              <div className="plot-empty">
-                输入有效的有限数值后，Mohr 圆将在这里实时更新。
+              <div className="results-empty">
+                <div className="panel-kicker">Current solution</div>
+                <h2>Waiting for valid input</h2>
+                <p>Correct the invalid value to restore the analysis.</p>
               </div>
             )}
-          </div>
+          </aside>
         </section>
-      </section>
-
-      {outcome.result ? <ResultsPanel result={outcome.result} /> : null}
-
-      <footer className="site-footer">
-        <span>基于 mohrpy 数学模型 · 结果仅供分析与教学参考</span>
-        <span>2D τ 有符号 · 3D τ 为模长</span>
-      </footer>
-    </main>
+      </main>
+    </div>
   )
 }
 

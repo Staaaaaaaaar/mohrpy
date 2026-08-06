@@ -38,6 +38,9 @@ function serializeSvg(source: SVGSVGElement): string {
     }
   })
 
+  clone
+    .querySelectorAll('.plot-hit-area, .cursor-crosshair, .cursor-hud')
+    .forEach((element) => element.remove())
   clone.setAttribute('width', '940')
   clone.setAttribute('height', '580')
   clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
@@ -95,13 +98,13 @@ export function ExportButtons({ svgRef, mode }: ExportButtonsProps) {
       canvas.height = 1160
       const context = canvas.getContext('2d')
       if (!context) {
-        throw new Error('浏览器未提供 Canvas 2D 上下文。')
+        throw new Error('Canvas 2D is unavailable in this browser.')
       }
       context.drawImage(image, 0, 0, canvas.width, canvas.height)
       const pngBlob = await new Promise<Blob>((resolve, reject) => {
         canvas.toBlob(
           (blob) =>
-            blob ? resolve(blob) : reject(new Error('PNG 编码失败。')),
+            blob ? resolve(blob) : reject(new Error('PNG encoding failed.')),
           'image/png',
         )
       })
@@ -113,17 +116,24 @@ export function ExportButtons({ svgRef, mode }: ExportButtonsProps) {
   }
 
   return (
-    <div className="action-row" aria-label="导出图像">
-      <button className="button" type="button" onClick={exportSvg}>
-        导出 SVG
+    <div className="action-row export-actions" aria-label="Export plot">
+      <button
+        className="button secondary"
+        type="button"
+        aria-label="Export SVG"
+        onClick={exportSvg}
+      >
+        Export SVG
       </button>
       <button
         className="button primary"
         type="button"
         disabled={busy}
+        aria-busy={busy}
+        aria-label={busy ? 'Exporting PNG' : 'Export PNG'}
         onClick={() => void exportPng()}
       >
-        {busy ? '正在导出…' : '导出 PNG'}
+        {busy ? 'Exporting…' : 'Export PNG'}
       </button>
     </div>
   )

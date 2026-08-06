@@ -16,23 +16,32 @@ export function NumberField({
   onChange,
 }: NumberFieldProps) {
   const valid = Number.isFinite(value)
+  const errorId = `${id}-error`
 
   return (
     <label className="field" htmlFor={id}>
       <span className="field-label">
         <span className="symbol">{symbol}</span>
-        <span>{label}</span>
+        <span className="field-kind">{label}</span>
       </span>
       <input
         className="number-input"
         id={id}
+        name={id}
         type="number"
         inputMode="decimal"
+        autoComplete="off"
         step="any"
         value={valid ? value : ''}
         aria-invalid={!valid}
+        aria-describedby={!valid ? errorId : undefined}
         onChange={(event) => onChange(event.currentTarget.valueAsNumber)}
       />
+      {!valid ? (
+        <span className="field-error" id={errorId}>
+          Enter a finite number
+        </span>
+      ) : null}
     </label>
   )
 }
