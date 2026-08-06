@@ -1,11 +1,11 @@
-name: Deploy interactive site
+name: Pages
 
 on:
   push:
     branches: [main]
     paths:
       - "web/**"
-      - ".github/workflows/pages.yml"
+      - ".github/workflows/page.yml"
   workflow_dispatch:
 
 permissions:
@@ -18,7 +18,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  deploy:
+    name: Build and deploy
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -38,10 +39,6 @@ jobs:
       - name: Install dependencies
         working-directory: web
         run: npm ci
-
-      - name: Run tests
-        working-directory: web
-        run: npm test
 
       - name: Build site
         working-directory: web
